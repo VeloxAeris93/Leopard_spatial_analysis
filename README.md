@@ -71,12 +71,6 @@ This is a simplified, standalone extract of a larger internal project
 repository, prepared specifically as a companion to the paper. Relative to
 that internal project, this version:
 
-- Consolidates ~20 separate pipeline scripts into the single `analysis.py`.
-- Drops the public-facing HTML dashboard, interactive Folium/Leaflet maps,
-  PDF report builder, and the leopard family-tree web app — none of which
-  are part of the scientific analysis.
-- Drops the older, superseded sightings-only analysis pipeline in favour of
-  the photo-based pipeline actually used for the paper's figures.
 - Replaces the internet-tile-fetching basemap figures (OpenStreetMap/Esri/
   Carto tiles + boundary shapefiles) with a simple offline home-range map,
   to keep this script dependency-light and runnable without network access
