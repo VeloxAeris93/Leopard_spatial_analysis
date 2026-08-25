@@ -65,14 +65,4 @@ python analysis.py
 Tables are written to `outputs/tables/`, figures to `outputs/figures/`
 (both gitignored — generated locally, not committed).
 
-## Scope of this repository
 
-This is a simplified, standalone extract of a larger internal project
-repository, prepared specifically as a companion to the paper. Relative to
-that internal project, this version:
-
-- Replaces the internet-tile-fetching basemap figures (OpenStreetMap/Esri/
-  Carto tiles + boundary shapefiles) with a simple offline home-range map,
-  to keep this script dependency-light and runnable without network access
-  or extra boundary data. Swap in your own basemap if you need one for
-  publication-quality cartography.
