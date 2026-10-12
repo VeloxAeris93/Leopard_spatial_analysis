@@ -1,8 +1,9 @@
-# Local data and generated outputs - never commit raw or derived data
+# Raw inputs and generated outputs are never committed (see README).
 /data/*
 !/data/.gitkeep
 /outputs/*
 !/outputs/.gitkeep
+/manuscript/
 
 # Python
 __pycache__/

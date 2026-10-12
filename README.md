@@ -1,68 +1,96 @@
 # Chitabe Leopards: Spatial Analysis
 
-Companion analysis code for the Chitabe leopard spatial-ecology paper
-(Okavango Delta, Botswana). This repository reproduces the full analysis
-pipeline — from raw photographic/sightings records through to the home-range
-and statistical results reported in the paper — in a single, readable script.
+Companion code for *Patterns of spatial overlap of leopards in the Okavango Delta*
+(Pretorius, Hamman, Keith & Somers). It rebuilds every table, figure and number in the
+revised manuscript from the raw photographic and sightings records.
 
-This is a **code companion**, not a data repository: no raw leopard location
-data is included here (see [Data](#data) below).
+This is a **code companion, not a data repository**: no leopard location data is
+included (see [Data](#data)).
+
+The scripts here are the exact scripts that produced the revised manuscript, copied
+from the project's working repository rather than re-implemented, so what you run is
+what we ran. The version that accompanied the original submission (a single
+`analysis.py`) is kept under the git tag
+[`submitted-version`](../../tree/submitted-version).
 
 ## Methodology
 
-Leopards are identified from a photo archive of camera and guide images plus
-a manually maintained sightings log. The pipeline:
+Leopards are identified from an archive of guide and camera photographs, a manually
+kept sightings log and the lineage register. In outline:
 
-1. **Extract image metadata** — reads GPS coordinates and capture dates from
-   each photo's EXIF data (falling back to a date encoded in the filename,
-   then the archive's file-modified time).
-2. **Clean the sightings log** — validates coordinates and fixes obvious
-   lat/long swaps.
-3. **Match photos to the sightings log** — links each photo to the closest
-   same-individual sightings-log entry within 50 m, borrowing its date to
-   correct photos whose EXIF date was corrupted during archiving.
-4. **Normalize detection events** — collapses repeat photos of the same
-   leopard, on the same day, within 250 m of each other into a single
-   detection event, so results reflect encounters rather than shutter count.
-5. **Temporal analysis** — detection timelines and monthly/seasonal patterns
-   (Botswana wet season: November–March, dry season: April–October).
-6. **Spatial subset** — restricts the home-range comparison to individuals
-   with at least 10 unique GPS points and 3 unique dates, to avoid
-   over-interpreting sparse records.
-7. **Home ranges** — minimum convex polygon (MCP) area per individual.
-8. **Overlap** — pairwise home-range overlap (km², % of range shared).
-9. **Statistics** — male vs. female home-range size (Mann-Whitney U, Cliff's
-   delta, bootstrap median difference with 95% CI) and overlap by pair type
-   (Female-Female / Female-Male / Male-Male; Kruskal-Wallis with Holm-corrected
-   pairwise Mann-Whitney follow-ups).
-10. **Detection table** — a final per-individual summary (identity, sex,
-    detection counts, date range, home-range area, spatial-subset inclusion).
+1. **Photo metadata** (`0`): GPS position and capture date from each photo's EXIF data
+   (read with Pillow, and with ExifTool where Pillow finds no GPS), with the leopard's name
+   taken from its folder.
+   A later batch of photos delivered without per-leopard folders is read separately.
+2. **Match to the sightings log** (`16a`): each photo is linked to the nearest sighting
+   of the same leopard; matches within 50 m count as high confidence.
+3. **Batch identities** (`16c`): the batch photos are named from a manual list
+   (`file_names_list.csv`); photos showing several leopards become one record per animal.
+4. **Encounter events** (`16b`): repeat photos of the same leopard on the same day within
+   250 m become one encounter event. Names later confirmed to be one animal are merged
+   first (`src/leopards/naming.py`: Morobe is Tswaletswale).
+5. **Date validity** (`16d`): the archive was exported with its capture dates stripped, so
+   photos whose only date is the export day (16 March 2026) keep their location but are
+   excluded from every dated analysis (`src/_dates.py`).
+6. **Seasonality** (`25`): detections by Botswana wet (Nov–Mar) and dry (Apr–Oct) season.
+7. **Inclusion** (`21`, `src/_inclusion.py`, `src/_age.py`): range estimates need at least
+   8 unique locations on at least 3 dates; cubs and subadults are excluded.
+8. **Home ranges** (`18`, `33`): 95% minimum convex polygons (MCP), estimated both pooled
+   and within time windows. The primary window is 1 June 2024 to 25 May 2026, so every
+   polygon in a comparison comes from the same period.
+9. **Overlap** (`33`, `34`): every pair of leopards in the window, including pairs that do
+   not overlap. Two-part models (does a pair overlap; if so, by what proportion) by pair
+   type (female–female, female–male, male–male), tested by node-label permutation
+   (10,000 permutations).
+10. **Null model** (`41`): observed overlap compared with overlap when the same polygons
+    are placed at random within the sampled area (and, as sensitivity checks, within 1 and
+    2 km of the 2013 road network).
+11. **Sex difference in range size** (`33`, `42`): Mann–Whitney test, effect size, and the
+    smallest difference the test could detect with 80% power.
+12. **Reviewer decomposition** (`37`): the submitted analysis rebuilt step by step into the
+    revised one, so each change's effect on the result can be seen.
+13. **Outputs** (`01b`, `35`, `23c`, `32`, `36`, `39`): Figures 2–6 and S1–S2, Supplementary Tables
+    S1–S5, and `outputs/tables/manuscript_numbers.md`, which lists every number quoted in
+    the manuscript with the table it comes from.
 
-Home ranges are broad indicators of space use given the available sightings,
-not exact territorial boundaries, and results should be read in light of
-uneven sampling effort across individuals and years.
+Home ranges summarise where each leopard was recorded, given uneven sampling effort
+across individuals and years; they are not exact territorial boundaries.
 
 ## Data
 
-No raw data is committed to this repository. To run the pipeline, create a
-`data/` folder containing:
+No raw data is committed. To run the pipeline, place these files in `data/`:
 
-| File | Description | Required columns |
-|---|---|---|
-| `data/leopard_photos.zip` | Photo archive, one top-level folder per leopard named e.g. `Chikara Female/` | JPEG/PNG files with EXIF GPS + date where available |
-| `data/sightings_log.xlsx` | Manual sightings log, sheet `Sheet1` | `Year`, `Month`, `Day`, `Lat`, `Long`, `Leopard`, `Guide`, `Behaviour`, `Notes`, `Other_Leopard`, `Leopard_2`, `Total_leopards` |
-| `data/leopard_lineage.xlsx` | Individual attributes, sheet `Lineage` | `leopard_name`, `sex`, `Estimated age` |
+| File | Contents |
+|---|---|
+| `Chitabe Leopards.zip` | Photo archive, one top-level folder per leopard (e.g. `Mapula female/`) |
+| `2026-05-27.zip` | Later photo batch, without per-leopard folders |
+| `file_names_list.csv` | Manual identities for the batch photos: `File Name`, `Leopard` (comma-separated when several leopards are in one photo) |
+| `Chitabe Leopards.xlsx` | Sightings log, sheet `Sheet1`: `Year`, `Month`, `Day`, `Lat`, `Long`, `Leopard`, `Guide`, `Behaviour`, `Notes`, `Other_Leopard`, `Leopard_2`, `Total_leopards` |
+| `leopard_lineage_master.xlsx` | Lineage register, sheet `Lineage`: `leopard_name`, `sex`, `Estimated age`, plus family links |
+| `chitabe_roads_2013.geojson` | 2013 game-drive road network (null-model sensitivity regions) |
+| `ng31.geojson` | NG31 concession boundary |
 
-Get in touch with the project team for access to the underlying dataset.
+Please contact the authors for access to the underlying data.
 
 ## Running
 
+Tested with Python 3.14 on Windows.
+
 ```bash
 pip install -r requirements.txt
-python analysis.py
+python src/run_paper_pipeline.py            # run what is out of date
+python src/run_paper_pipeline.py --force    # rebuild everything
+python src/run_paper_pipeline.py --check    # report what is out of date, run nothing
 ```
 
-Tables are written to `outputs/tables/`, figures to `outputs/figures/`
-(both gitignored — generated locally, not committed).
+- **ExifTool** must be installed (exiftool.org). Set the `EXIFTOOL` environment variable if
+  it is not on your PATH.
+- A full run takes about half an hour; the permutation models (`34`) and the null model
+  (`41`) take most of it.
+- Figure 3 (`23c`) downloads floodplain outlines from OpenStreetMap on its first run and
+  caches them in `outputs/cache/`.
 
-
+The runner records each stage's inputs and outputs. It reruns anything out of date and
+finishes with a consistency check, so the tables, figures and numbers always come from
+the same run. Tables are written to `outputs/tables/`, figures to `outputs/figures/`, and
+Supplementary Tables to `manuscript/`.
