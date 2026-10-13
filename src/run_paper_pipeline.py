@@ -26,7 +26,7 @@ from pathlib import Path
 import subprocess
 import sys
 
-from _paths import BATCH_ZIPS, FILE_NAMES_LIST, LINEAGE_XLSX, NG31_GEOJSON, PHOTO_ZIP, ROADS_GEOJSON, SIGHTINGS_XLSX
+from _paths import BATCH_ZIPS, FILE_NAMES_LIST, LINEAGE_XLSX, NG31_EDIT_SHP, NG31_GEOJSON, PHOTO_ZIP, ROADS_GEOJSON, SIGHTINGS_XLSX
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
@@ -233,6 +233,12 @@ STAGES: list[Stage] = [
         ],
         outputs=[FIGS / "new_fig_merged_subset_home_ranges_map_osm_vector_gray.png"],
         note="Figure 3 - contemporary-window 95% MCP map",
+    ),
+    Stage(
+        "24c_paper_study_area_map_carto_positron.py",
+        inputs=[TABLES / "merged_leopard_images_metadata.dated_events.csv", NG31_EDIT_SHP],
+        outputs=[FIGS / "new_fig_study_area_ng31_osm_vector_gray.png"],
+        note="Figure 1 - study area and encounter locations (basemap tiles cached on first run)",
     ),
     Stage(
         "32_export_individual_detection_table.py",

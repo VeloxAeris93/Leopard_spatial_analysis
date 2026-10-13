@@ -49,7 +49,7 @@ kept sightings log and the lineage register. In outline:
     smallest difference the test could detect with 80% power.
 12. **Reviewer decomposition** (`37`): the submitted analysis rebuilt step by step into the
     revised one, so each change's effect on the result can be seen.
-13. **Outputs** (`01b`, `35`, `23c`, `32`, `36`, `39`): Figures 2–6 and S1–S2, Supplementary Tables
+13. **Outputs** (`01b`, `24c`, `35`, `23c`, `32`, `36`, `39`): Figures 1–6 and S1–S2, Supplementary Tables
     S1–S5, and `outputs/tables/manuscript_numbers.md`, which lists every number quoted in
     the manuscript with the table it comes from.
 
@@ -69,6 +69,7 @@ No raw data is committed. To run the pipeline, place these files in `data/`:
 | `leopard_lineage_master.xlsx` | Lineage register, sheet `Lineage`: `leopard_name`, `sex`, `Estimated age`, plus family links |
 | `chitabe_roads_2013.geojson` | 2013 game-drive road network (null-model sensitivity regions) |
 | `ng31.geojson` | NG31 concession boundary |
+| `ng31_edit.shp` (with `.shx`, `.dbf`, `.prj`) | Edited NG31 outline drawn on the study-area map (Figure 1) |
 
 Please contact the authors for access to the underlying data.
 
@@ -87,8 +88,12 @@ python src/run_paper_pipeline.py --check    # report what is out of date, run no
   it is not on your PATH.
 - A full run takes about half an hour; the permutation models (`34`) and the null model
   (`41`) take most of it.
-- Figure 3 (`23c`) downloads floodplain outlines from OpenStreetMap on its first run and
-  caches them in `outputs/cache/`.
+- Figure 3 (`23c`) draws its floodplain from a saved OpenStreetMap snapshot (`reference/`,
+  © OpenStreetMap contributors, ODbL), so it matches the published figure exactly.
+- Figure 1 (`24c`) downloads its greyscale background map tiles on the first run and
+  caches them in `outputs/cache/`. The tiles change over time, so the background can
+  differ slightly from the published figure; the plotted records, boundary and labels
+  are identical. Its Africa inset uses Natural Earth outlines saved in `reference/`.
 
 The runner records each stage's inputs and outputs. It reruns anything out of date and
 finishes with a consistency check, so the tables, figures and numbers always come from

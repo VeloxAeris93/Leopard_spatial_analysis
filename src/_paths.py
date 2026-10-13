@@ -65,6 +65,18 @@ NG31_GEOJSON = _first_existing(
     DATA / "ng31.geojson",
     ROOT / "data_inputs" / "Concession Boundary" / "ng31.geojson",
 )
+# Edited NG31 outline drawn on the study-area map (Figure 1); shapefile with .shx/.dbf/.prj.
+NG31_EDIT_SHP = _first_existing(
+    DATA / "ng31_edit.shp",
+    ROOT / "data_inputs" / "Concession Boundary" / "ng31_edit.shp",
+    ROOT / "ng31_edit.shp",
+)
+# Natural Earth 1:110m country outlines for the Figure 1 inset (public domain), kept so the
+# figure does not need a download.
+NATURAL_EARTH_COUNTRIES = _first_existing(
+    DATA / "ne_110m_admin_0_countries.geojson",
+    ROOT / "reference" / "ne_110m_admin_0_countries.geojson",
+)
 
 # OpenStreetMap water/wetland snapshot behind the floodplain shading in Figure 3, taken on
 # 25 Aug 2026 and kept so the figure does not depend on a live server or later OSM edits.
